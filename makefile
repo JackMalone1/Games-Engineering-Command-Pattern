@@ -3,7 +3,7 @@ fileName := sampleapp
 files := "./src/*.cpp"
 CC = g++
 
-LINKER_FLAGS  = -lmingw32 -lSDL2main -lSDL2
+LINKER_FLAGS  = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 BUILD_DIR := ./bin
 
 
