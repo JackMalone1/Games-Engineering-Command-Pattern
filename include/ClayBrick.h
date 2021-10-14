@@ -14,6 +14,11 @@ public:
 
     void draw()
     {
-        
+        std::cout << "Clay Brick" << std::endl;   
+    }
+
+    std::string getType()
+    {
+        return "Clay Brick";
     }
 };

@@ -9,6 +9,11 @@ public:
 
     void draw()
     {
-        
+        std::cout << "Lego Brick" << std::endl;
+    }
+
+    std::string getType()
+    {
+        return "Lego Brick";
     }
 } ;

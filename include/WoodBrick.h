@@ -10,6 +10,11 @@ public:
 
     void draw()
     {
-        
+        std::cout << "Wood Brick" << std::endl;
+    }
+
+    std::string getType()
+    {
+        return "Wood Brick";
     }
 };

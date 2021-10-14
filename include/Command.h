@@ -1,7 +1,8 @@
 #pragma once
 
-#include <list>
+
 #include <vector>
+#include <stack>
 #include "LegoBrickFactory.h"
 #include "ClayBrickFactory.h"
 #include "WoodBrickFactory.h"
@@ -9,27 +10,35 @@
 
 class Command
 {
+
 public:
     virtual ~Command(){};
     virtual void execute() = 0;
     virtual void undo() = 0;
     virtual void redo() = 0;
+    virtual void add(){counter++;}
+    virtual void remove(){counter--;}
+    virtual int getAmount(){return counter;}
 protected:
-    Command();
+    Command(){};
+    int counter;
 };
 
 class BuildLegoBrickCommand : public Command
 { 
 public:
+    BuildLegoBrickCommand() = default;
+    ~BuildLegoBrickCommand(){};
     virtual void execute() 
     {
         Factory* factory = new LegoBrickFactory();
-        m_legoBricks.push_back(factory->getBricks(1).at(0));
+        m_bricks.push_back(factory->getBrick());
+        counter = 0;
     }
 
     virtual void undo()
     {
-        m_legoBricks.pop_back();
+        m_bricks.pop_back();
     }
 
     virtual void redo()
@@ -41,15 +50,18 @@ public:
 class BuildClayBrickCommand : public Command
 {
 public:
+    BuildClayBrickCommand() = default;
+    ~BuildClayBrickCommand(){};
     virtual void execute() 
     {
         Factory* factory = new ClayBrickFactory();
-        m_clayBricks.push_back(factory->getBricks(1).at(0));
+        m_bricks.push_back(factory->getBrick());
+        counter = 0;
     }
 
     virtual void undo()
     {
-        m_clayBricks.pop_back();
+        m_bricks.pop_back();
     }
     virtual void redo()
     {
@@ -57,18 +69,21 @@ public:
     }
 };
 
-class WoodBrickCommand : public Command
+class BuildWoodBrickCommand : public Command
 {
 public:
+    BuildWoodBrickCommand() = default;
+    ~BuildWoodBrickCommand(){};
     virtual void execute() 
     {
         Factory* factory = new ClayBrickFactory();
-        m_clayBricks.push_back(factory->getBricks(1).at(0));
+        m_bricks.push_back(factory->getBrick());
+        counter = 0;
     }
 
     virtual void undo()
     {
-        m_clayBricks.pop_back();
+        m_bricks.pop_back();
     }
     virtual void redo()
     {
@@ -79,23 +94,45 @@ public:
 class MacroCommand : public Command
 {
 public:
-    MacroCommand();
-    virtual ~MacroCommand();
+    MacroCommand(){};
+    virtual ~MacroCommand(){};
     virtual void add(Command* command)
     {
-        commands->push_back(command);
+        command->add();
+        commands.push_back(command);
     }
-    virtual void remove(Command* command)
+    virtual void remove()
     {
-        commands->remove(command);
+        if(commands.size() > 0)
+        {
+            undoCommands.push(commands.at(commands.size() - 1));
+            commands.pop_back();
+            undoCommands.top()->remove();
+        }
     }
     virtual void execute()
     {
-        for(Command* command : *commands)
+        for(Command* command : commands)
         {
             command->execute();
         }
     }
+
+    virtual void undo()
+    {
+        if(undoCommands.size() > 0)
+        {
+            undoCommands.top()->add();
+            commands.push_back(undoCommands.top());
+            undoCommands.pop();
+        }
+    }
+
+    virtual void redo()
+    {
+
+    }
 private:
-    std::list<Command*>* commands;
+    std::vector<Command*> commands;
+    std::stack<Command*> undoCommands;
 };

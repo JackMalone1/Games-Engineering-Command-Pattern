@@ -6,15 +6,8 @@
 class WoodBrickFactory : public Factory
 {
 public:
-    std::vector<Brick*> getBricks(int t_numberOfBricks)
+    Brick* getBrick()
     {
-        std::vector<Brick*> values;
-
-        for(int i = 0; i < t_numberOfBricks; i++)
-        {
-            values.push_back(new WoodBrick());
-        }
-
-        return values;
+        return new WoodBrick();
     }
 };
