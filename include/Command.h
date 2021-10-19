@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stack>
+#include <iostream>
 #include "LegoBrickFactory.h"
 #include "ClayBrickFactory.h"
 #include "WoodBrickFactory.h"
@@ -14,14 +15,14 @@ class Command
 public:
     virtual ~Command(){};
     virtual void execute() = 0;
-    virtual void undo() = 0;
-    virtual void redo() = 0;
+    virtual void undo(){};
+    virtual void redo(){};
     virtual void add(){counter++;}
     virtual void remove(){counter--;}
     virtual int getAmount(){return counter;}
 protected:
     Command(){};
-    int counter;
+    int counter=0;
 };
 
 class BuildLegoBrickCommand : public Command
@@ -31,9 +32,11 @@ public:
     ~BuildLegoBrickCommand(){};
     virtual void execute() 
     {
+        std::cout << "Order lego brick" << std::endl;
         Factory* factory = new LegoBrickFactory();
         m_bricks.push_back(factory->getBrick());
         counter = 0;
+        add();
     }
 
     virtual void undo()
@@ -41,10 +44,6 @@ public:
         m_bricks.pop_back();
     }
 
-    virtual void redo()
-    {
-        execute();
-    }
 };
 
 class BuildClayBrickCommand : public Command
@@ -54,6 +53,7 @@ public:
     ~BuildClayBrickCommand(){};
     virtual void execute() 
     {
+        std::cout << "Order clay brick" << std::endl;
         Factory* factory = new ClayBrickFactory();
         m_bricks.push_back(factory->getBrick());
         counter = 0;
@@ -62,10 +62,6 @@ public:
     virtual void undo()
     {
         m_bricks.pop_back();
-    }
-    virtual void redo()
-    {
-        execute();
     }
 };
 
@@ -76,6 +72,7 @@ public:
     ~BuildWoodBrickCommand(){};
     virtual void execute() 
     {
+        std::cout << "order wood brick" << std::endl;
         Factory* factory = new ClayBrickFactory();
         m_bricks.push_back(factory->getBrick());
         counter = 0;
@@ -84,10 +81,6 @@ public:
     virtual void undo()
     {
         m_bricks.pop_back();
-    }
-    virtual void redo()
-    {
-        execute();
     }
 };
 
@@ -120,17 +113,24 @@ public:
 
     virtual void undo()
     {
-        if(undoCommands.size() > 0)
+        if(commands.size() > 0)
         {
-            undoCommands.top()->add();
-            commands.push_back(undoCommands.top());
-            undoCommands.pop();
+            std::cout << "undo last command" << std::endl;
+            undoCommands.push(commands.at(commands.size()-1));
+            commands.pop_back();
+            undoCommands.top()->remove();
         }
     }
 
     virtual void redo()
     {
-
+        if(undoCommands.size() > 0)
+        {
+            std::cout << "redo last command" << std::endl;
+            undoCommands.top()->add();
+            commands.push_back(undoCommands.top());
+            undoCommands.pop();
+        }
     }
 private:
     std::vector<Command*> commands;

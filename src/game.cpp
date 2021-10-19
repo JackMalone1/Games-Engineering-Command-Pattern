@@ -19,9 +19,9 @@ Game::Game()
             std::cout << "Failed to create window. Error: " << SDL_GetError();
         }
 
-        buttons.push_back(new Button(50,50,renderer, m_font, "lego brick", new BuildLegoBrickCommand()));
-        buttons.push_back(new Button(50,250,renderer, m_font, "wood brick", new BuildWoodBrickCommand()));
-        buttons.push_back(new Button(250,50,renderer, m_font, "lego brick", new BuildClayBrickCommand()));
+        buttons.push_back(new Button(50,50,renderer, m_font, "lego brick", new BuildLegoBrickCommand(), true));
+        buttons.push_back(new Button(50,250,renderer, m_font, "wood brick", new BuildWoodBrickCommand(), true));
+        buttons.push_back(new Button(250,50,renderer, m_font, "clay brick", new BuildClayBrickCommand(), true));
         buttons.push_back(new CommandButton(700,100, renderer, m_font , "Undo", nullptr));
         buttons.push_back(new CommandButton(700, 300, renderer, m_font , "Redo", nullptr));
         buttons.push_back(new CommandButton(1000, 200, renderer, m_font , "Build", nullptr));
@@ -46,7 +46,7 @@ void Game::handleEvents()
         int x,y;
         Uint32 mouseButtons;
 
-        SDL_PumpEvents();  // make sure we have the latest mouse state.
+        SDL_PumpEvents();
 
         mouseButtons = SDL_GetMouseState(&x, &y);
 

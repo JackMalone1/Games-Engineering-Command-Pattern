@@ -11,14 +11,15 @@ class Game;
 class Button
 {
 public:
-    Button(float t_x, float t_y, SDL_Renderer* t_renderer, TTF_Font* t_font, std::string t_name, Command* t_command) :
+    Button(float t_x, float t_y, SDL_Renderer* t_renderer, TTF_Font* t_font, std::string t_name, Command* t_command, bool t_showCounter=false) :
     x(t_x),
     y(t_y),
     renderer(t_renderer),
     font(t_font),
     name(t_name),
     counter(0),
-    command(t_command)
+    command(t_command),
+    m_showCounter(t_showCounter)
     {
         init();
     }
@@ -27,8 +28,9 @@ public:
 
     void draw()
     {
-        SDL_SetRenderDrawColor(renderer, 0,255,0,255);
+        SDL_SetRenderDrawColor(renderer, 0,0,255,255);
         SDL_RenderDrawRect(renderer, &background);
+        SDL_SetRenderDrawColor(renderer, 255,0,0,255);
         SDL_RenderCopy(renderer, textTexture,nullptr, &text);
         if(m_showCounter)
         {
@@ -63,9 +65,9 @@ private:
     void initText()
     {
         SDL_Surface* surface = TTF_RenderText_Solid(font, name.c_str(), SDL_Color{0,255,0});
-        textTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_QueryTexture(textTexture, nullptr, nullptr, &text.w, &text.h);
-        text.x = x + (background.x / 2.0f);
+        textTexture = SDL_CreateTextureFromSurface(renderer, surface);        
+        SDL_QueryTexture(textTexture, nullptr, nullptr, &text.w, &text.h);        
+        text.x = x + (background.w / 2.0f) - ((text.w / 2.0f));
         text.y = y + (background.h / 2.0f) - (text.h / 2.0f);
         if(textTexture == nullptr) std::cout << SDL_GetError() << std::endl;
         SDL_FreeSurface(surface);
