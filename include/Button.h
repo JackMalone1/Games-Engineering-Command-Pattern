@@ -11,15 +11,15 @@ class Game;
 class Button
 {
 public:
-    Button(float t_x, float t_y, SDL_Renderer* t_renderer, TTF_Font* t_font, std::string t_name, Command* t_command, bool t_showCounter=false) :
+    Button(float t_x, float t_y, SDL_Renderer* t_renderer, TTF_Font* t_font, std::string t_name, Command* t_command, bool t_showCounter=false, int* t_counter=nullptr) :
     x(t_x),
     y(t_y),
     renderer(t_renderer),
     font(t_font),
     name(t_name),
-    counter(0),
     command(t_command),
-    m_showCounter(t_showCounter)
+    m_showCounter(t_showCounter),
+    counter(t_counter)
     {
         init();
     }
@@ -51,7 +51,7 @@ public:
     virtual void click(MacroCommand* t_macro)
     {
         t_macro->add(command);
-        counter++;
+        *counter = *counter + 1;
         
         UpdateCounter();
     }
@@ -59,7 +59,8 @@ public:
     virtual void UpdateCounter()
     {
         if (command != nullptr && m_showCounter)
-        initCounter("Count" + std::to_string(counter));
+        if(counter != nullptr)
+            initCounter("Count" + std::to_string(*counter));
     }
 private:
     void increaseNumberOfBlocks();
@@ -82,7 +83,7 @@ private:
 
         SDL_QueryTexture(counterTexture, NULL, NULL, & counterText.w, & counterText.h);
 
-        counterText.x = x - (counterText.w / 2.0f);
+        counterText.x = text.x;
         counterText.y = y + 128 - (counterText.h / 2.0f);
         if(counterTexture == nullptr) std::cout << SDL_GetError() << std::endl;
         SDL_FreeSurface(tempSurf);
@@ -95,7 +96,7 @@ private:
         background.w = 150;
         background.h = 150;
         initText();
-        if(m_showCounter) initCounter("Count" + std::to_string(counter));
+        if(m_showCounter && counter != nullptr) initCounter("Count" + std::to_string(*counter));
         
     }
 protected:
@@ -109,7 +110,7 @@ protected:
     SDL_Texture* counterTexture;
     SDL_Rect counterText;
     std::string name;
-    int counter;
+    int* counter;
     Command* command;
     bool m_showCounter;
 };
