@@ -5,6 +5,7 @@ Game::Game()
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         std::cout << "SDL could not be initialised. Error: " << SDL_GetError();
+        run = false;
     }
     else
     {
@@ -26,7 +27,7 @@ Game::Game()
         buttons.push_back(new CommandButton(700, 300, renderer, m_font , "Redo", nullptr));
         buttons.push_back(new CommandButton(1000, 200, renderer, m_font , "Build", nullptr));
         static_cast<CommandButton*>(buttons.at(3))->setRemoveCommand(true);
-        static_cast<CommandButton*>(buttons.at(5))->addFunction(Game::displayTotals, this);   
+        static_cast<CommandButton*>(buttons.at(5))->addFunction(&Game::displayTotals, this);   
     }
 }
 
@@ -75,7 +76,6 @@ void Game::render()
     {
         button->draw();
     }
-    SDL_RenderCopy(renderer, m_totalsText, nullptr, &m_totalsRect);
     SDL_SetRenderDrawColor(renderer, 255,255,255,255);
     SDL_RenderPresent(renderer);
 }
@@ -106,22 +106,16 @@ void Game::displayTotals()
 {
     commands.execute();
     std::string s = "Built: ";
-    int i =0;
-    for(auto& brick : m_bricks)
+
+    if(m_bricks.size() > 0)
     {
-        s += brick->getType() + " , ";
+        for(auto& brick : m_bricks)
+        {
+            s += brick->getType() + "\n";
+        }
+
+        m_bricks.clear();
     }
-
-    m_bricks.clear();
-
-    SDL_Surface* tempSurf = TTF_RenderText_Solid(m_font, s.c_str(), SDL_Color{255,255,255});
-
-    m_totalsText = SDL_CreateTextureFromSurface(renderer, tempSurf);
-
-    SDL_QueryTexture(m_totalsText, NULL, NULL, & m_totalsRect.w, & m_totalsRect.h);
-
-    m_totalsRect.x = 100;
-    m_totalsRect.y = 500;
-
-    SDL_FreeSurface(tempSurf);
+    
+    std::cout << s;
 }

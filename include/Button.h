@@ -51,14 +51,15 @@ public:
     virtual void click(MacroCommand* t_macro)
     {
         t_macro->add(command);
-        //if(command) command->execute();
         counter++;
+        
+        UpdateCounter();
     }
 
     virtual void UpdateCounter()
     {
         if (command != nullptr && m_showCounter)
-        initCounter(std::to_string(command->getAmount()));
+        initCounter("Count" + std::to_string(counter));
     }
 private:
     void increaseNumberOfBlocks();
@@ -75,15 +76,15 @@ private:
 
     void initCounter(std::string string)
     {
-        SDL_Surface* tempSurf = TTF_RenderText_Solid(font, string.c_str(), SDL_Color{255,255,255});
+        SDL_Surface* tempSurf = TTF_RenderText_Solid(font, string.c_str(), SDL_Color{0,255,0});
 
         counterTexture = SDL_CreateTextureFromSurface(renderer, tempSurf);
 
         SDL_QueryTexture(counterTexture, NULL, NULL, & counterText.w, & counterText.h);
 
-        counterText.x = x + 128 - (counterText.w / 2.0f);
-        counterText.y = y + 128 + (counterText.h / 2.0f);
-
+        counterText.x = x - (counterText.w / 2.0f);
+        counterText.y = y + 128 - (counterText.h / 2.0f);
+        if(counterTexture == nullptr) std::cout << SDL_GetError() << std::endl;
         SDL_FreeSurface(tempSurf);
     }
 
@@ -94,7 +95,8 @@ private:
         background.w = 150;
         background.h = 150;
         initText();
-        initCounter(std::to_string(0));
+        if(m_showCounter) initCounter("Count" + std::to_string(counter));
+        
     }
 protected:
     float x;
@@ -143,18 +145,24 @@ public:
     {
         if (m_caller == nullptr && m_func == nullptr)
         {
-            if (m_removeCommand)
-                t_macro->remove();
-            else
+            if(m_removeCommand)
+            {
+                std::cout << "undo" << std::endl;
                 t_macro->undo();
+            } 
+            else 
+            {
+                std::cout << "redo" << std::endl;
+                t_macro->redo();
+            }
         }
-        else
+        else if(m_func != nullptr)
         {
             m_func(m_caller);
         }
     }
 private:
-    bool m_removeCommand;
-    std::function<void(Game*)> m_func;
-    Game* m_caller;
+    bool m_removeCommand=false;
+    std::function<void(Game*)> m_func=nullptr;
+    Game* m_caller=nullptr;
 };

@@ -42,6 +42,8 @@ public:
     virtual void undo()
     {
         m_bricks.pop_back();
+        legoBrickCounter--;
+        std::cout << "remove one" << std::endl;
     }
 
 };
@@ -62,6 +64,8 @@ public:
     virtual void undo()
     {
         m_bricks.pop_back();
+        clayBrickCounter--;
+        std::cout << "remove one" << std::endl;
     }
 };
 
@@ -73,7 +77,7 @@ public:
     virtual void execute() 
     {
         std::cout << "order wood brick" << std::endl;
-        Factory* factory = new ClayBrickFactory();
+        Factory* factory = new WoodBrickFactory();
         m_bricks.push_back(factory->getBrick());
         counter = 0;
     }
@@ -81,6 +85,8 @@ public:
     virtual void undo()
     {
         m_bricks.pop_back();
+        woodBrickCounter--;
+        std::cout << "remove one" << std::endl;
     }
 };
 
@@ -98,6 +104,7 @@ public:
     {
         if(commands.size() > 0)
         {
+            std::cout << "remove one" << std::endl;
             undoCommands.push(commands.at(commands.size() - 1));
             commands.pop_back();
             undoCommands.top()->remove();
@@ -105,10 +112,14 @@ public:
     }
     virtual void execute()
     {
-        for(Command* command : commands)
+        if(commands.size() > 0)
         {
-            command->execute();
+            for(Command* command : commands)
+            {
+                command->execute();
+            }
         }
+
     }
 
     virtual void undo()
@@ -117,6 +128,7 @@ public:
         {
             std::cout << "undo last command" << std::endl;
             undoCommands.push(commands.at(commands.size()-1));
+            //commands.at(commands.size()-1)->undo();
             commands.pop_back();
             undoCommands.top()->remove();
         }
